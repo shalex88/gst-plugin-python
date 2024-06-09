@@ -14,11 +14,16 @@ def custom_processing(frame):
 
     # Example: Convert frame to grayscale
     # grayscale_frame = np.mean(frame, axis=2).astype(np.uint8)
+
+    # Example: Convert frame to grayscale with OpenCV   
+    # import cv2
+    # grayscale_frame = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
+
     # processed_frame = np.stack((grayscale_frame,)*3, axis=-1)
 
     return processed_frame
 ############################################################################
-
+import sys
 import gi
 
 gi.require_version('Gst', '1.0')
@@ -26,6 +31,9 @@ gi.require_version('GstBase', '1.0')
 
 from gi.repository import Gst, GObject, GstBase
 import numpy as np
+
+print('Python version: {}.{}.{}'.format(sys.version_info.major, sys.version_info.minor, sys.version_info.micro))
+print('NumPy version: {}'.format(np.__version__))
 
 Gst.init(None)
 
@@ -93,7 +101,6 @@ class CustomTransformElement(GstBase.BaseTransform):
         frame = frame_data.reshape((self.height, self.width, self.channels))
 
         processed_frame = self.custom_processing_func(frame)
-
         np.copyto(frame_data, processed_frame.flatten())
 
         inbuf.unmap(map_info)
