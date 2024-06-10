@@ -93,18 +93,19 @@ class CustomTransformElement(GstBase.BaseTransform):
             return ret.fixate()
 
     def do_transform_ip(self, inbuf: Gst.Buffer) -> Gst.FlowReturn:
-        success, map_info = inbuf.map(Gst.MapFlags.READ | Gst.MapFlags.WRITE)
-        if not success:
+        try:
+            success, map_info = inbuf.map(Gst.MapFlags.READ | Gst.MapFlags.WRITE)
+
+            frame_data = np.frombuffer(map_info.data, dtype=np.uint8)
+            frame = frame_data.reshape((self.height, self.width, self.channels))
+            processed_frame = self.custom_processing_func(frame)
+            np.copyto(frame_data, processed_frame.flatten())
+            inbuf.unmap(map_info)
+
+            return Gst.FlowReturn.OK
+        except Exception as e:
+            print(f"Error occurred during custom processing: {e}")
             return Gst.FlowReturn.ERROR
-
-        frame_data = np.frombuffer(map_info.data, dtype=np.uint8)
-        frame = frame_data.reshape((self.height, self.width, self.channels))
-
-        processed_frame = self.custom_processing_func(frame)
-        np.copyto(frame_data, processed_frame.flatten())
-
-        inbuf.unmap(map_info)
-        return Gst.FlowReturn.OK
 
 GObject.type_register(CustomTransformElement)
 __gstelementfactory__ = (ELEMENT_NAME, Gst.Rank.NONE, CustomTransformElement)
