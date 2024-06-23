@@ -1,16 +1,9 @@
 ############# Custom element configuration #################################
 ELEMENT_NAME = 'custom_transform_element'
-WIDTH = 640
-HEIGHT = 480
-CHANNELS = 2
-FRAMERATE_NUM = 30
-FRAMERATE_DENOM = 1
-FORMAT = 'YUY2'
 
 def custom_processing(frame):
     # Example: Invert frame
     frame[:] = 255 - frame[:]
-
     return frame
 ############################################################################
 import sys
@@ -27,9 +20,6 @@ print('NumPy version: {}'.format(np.__version__))
 
 Gst.init(None)
 
-OCAPS = Gst.Caps.from_string('video/x-raw, format=(string){}, width=(int){}, height=(int){}, framerate=(fraction){}/{}'.format(FORMAT, WIDTH, HEIGHT, FRAMERATE_NUM, FRAMERATE_DENOM))
-ICAPS = Gst.Caps.from_string('video/x-raw, format=(string){}, width=(int){}, height=(int){}, framerate=(fraction){}/{}'.format(FORMAT, WIDTH, HEIGHT, FRAMERATE_NUM, FRAMERATE_DENOM))
-
 class CustomTransformElement(GstBase.BaseTransform):
     __gstmetadata__ = ('Custom Transform Element', 'Transform', 'Base for Custom Transform Element', 'Alex Sh')
 
@@ -38,13 +28,13 @@ class CustomTransformElement(GstBase.BaseTransform):
             'src',
             Gst.PadDirection.SRC,
             Gst.PadPresence.ALWAYS,
-            OCAPS
+            Gst.Caps.from_string('video/x-raw')
         ),
         Gst.PadTemplate.new(
             'sink',
             Gst.PadDirection.SINK,
             Gst.PadPresence.ALWAYS,
-            ICAPS
+            Gst.Caps.from_string('video/x-raw')
         )
     )
 
@@ -53,34 +43,14 @@ class CustomTransformElement(GstBase.BaseTransform):
 
         self.element_name = ELEMENT_NAME
         self.custom_processing_func = custom_processing
-        self.width = WIDTH
-        self.height = HEIGHT
-        self.channels = CHANNELS
 
     def do_transform_caps(self, direction, caps, filter_):
-        if direction == Gst.PadDirection.SRC:
-            res = ICAPS
-        else:
-            res = OCAPS
+        # Pass input caps to output caps directly
+        return caps
 
-        if filter_:
-            res = res.intersect(filter_)
-
-        return res
-
-    def do_fixate_caps(self, direction, caps, othercaps):
-        if direction == Gst.PadDirection.SRC:
-            return othercaps.fixate()
-        else:
-            so = othercaps.get_structure(0).copy()
-            so.fixate_field_nearest_fraction("framerate",
-                                             FRAMERATE_NUM,
-                                             FRAMERATE_DENOM)
-            so.fixate_field_nearest_int("width", WIDTH)
-            so.fixate_field_nearest_int("height", HEIGHT)
-            ret = Gst.Caps.new_empty()
-            ret.append_structure(so)
-            return ret.fixate()
+    def do_set_caps(self, incaps, outcaps):
+        self.incaps = incaps
+        return True
 
     def do_transform_ip(self, inbuf: Gst.Buffer) -> Gst.FlowReturn:
         try:
