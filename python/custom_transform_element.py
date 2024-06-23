@@ -2,26 +2,16 @@
 ELEMENT_NAME = 'custom_transform_element'
 WIDTH = 640
 HEIGHT = 480
-CHANNELS = 3
-FRAMERATE_NUM = 25
+CHANNELS = 2
+FRAMERATE_NUM = 30
 FRAMERATE_DENOM = 1
-FORMAT = 'RGB'
+FORMAT = 'YUY2'
 
-# Custom processing can be added here
 def custom_processing(frame):
-    # Example: No processing
-    processed_frame = frame
+    # Example: Invert frame
+    frame[:] = 255 - frame[:]
 
-    # Example: Convert frame to grayscale
-    # grayscale_frame = np.mean(frame, axis=2).astype(np.uint8)
-
-    # Example: Convert frame to grayscale with OpenCV   
-    # import cv2
-    # grayscale_frame = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
-
-    # processed_frame = np.stack((grayscale_frame,)*3, axis=-1)
-
-    return processed_frame
+    return frame
 ############################################################################
 import sys
 import gi
@@ -77,7 +67,7 @@ class CustomTransformElement(GstBase.BaseTransform):
             res = res.intersect(filter_)
 
         return res
-    
+
     def do_fixate_caps(self, direction, caps, othercaps):
         if direction == Gst.PadDirection.SRC:
             return othercaps.fixate()
@@ -96,10 +86,8 @@ class CustomTransformElement(GstBase.BaseTransform):
         try:
             success, map_info = inbuf.map(Gst.MapFlags.READ | Gst.MapFlags.WRITE)
 
-            frame_data = np.frombuffer(map_info.data, dtype=np.uint8)
-            frame = frame_data.reshape((self.height, self.width, self.channels))
-            processed_frame = self.custom_processing_func(frame)
-            np.copyto(frame_data, processed_frame.flatten())
+            frame = np.frombuffer(map_info.data, dtype=np.uint8)
+            frame = self.custom_processing_func(frame)
             inbuf.unmap(map_info)
 
             return Gst.FlowReturn.OK
