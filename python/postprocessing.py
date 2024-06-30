@@ -1,5 +1,5 @@
 ############# Custom element configuration #################################
-ELEMENT_NAME = 'custom_transform_element'
+ELEMENT_NAME = 'postprocessing'
 
 def custom_processing(frame):
     # Example: Invert frame
