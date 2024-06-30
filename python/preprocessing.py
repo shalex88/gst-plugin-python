@@ -1,9 +1,10 @@
 ############# Custom element configuration #################################
-ELEMENT_NAME = 'custom_transform_element'
+ELEMENT_NAME = 'preprocessing'
 
 def custom_processing(frame):
     # Example: Invert frame
     frame[:] = 255 - frame[:]
+    # ariel
     return frame
 ############################################################################
 import sys
