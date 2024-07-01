@@ -56,8 +56,9 @@ class CustomTransformElement(GstBase.BaseTransform):
         try:
             success, map_info = inbuf.map(Gst.MapFlags.READ | Gst.MapFlags.WRITE)
 
-            frame = np.frombuffer(map_info.data, dtype=np.uint8)
-            frame = self.custom_processing_func(frame)
+            original_frame = np.frombuffer(map_info.data, dtype=np.uint8)
+            processed_frame = self.custom_processing_func(original_frame)
+            np.copyto(original_frame, processed_frame)
             inbuf.unmap(map_info)
 
             return Gst.FlowReturn.OK
