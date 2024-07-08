@@ -22,14 +22,14 @@ export GST_PLUGIN_PATH=./
 # Test
 gst-inspect-1.0 custom_src_element
 # Run
-gst-launch-1.0 custom_src_element ! autovideosink
+gst-launch-1.0 custom_src_element ! fpsdisplaysink
 
 # Install
 pip install numpy
 # Test
-gst-inspect-1.0 custom_transform_element
+gst-inspect-1.0 preprocessing
 # Run
-gst-launch-1.0 videotestsrc ! custom_transform_element ! autovideoconvert ! autovideosink -vvv
-gst-launch-1.0 videotestsrc ! video/x-raw,width=1280,height=1080,framerate=60/1,format=RGB ! custom_transform_element ! autovideoconvert ! autovideosink -vvv
-gst-launch-1.0 videotestsrc ! video/x-raw,width=640,height=480,framerate=30/1,format=YUY2 ! textoverlay text="Camera1" ! custom_transform_element ! nvvidconv ! autovideosink -vvv
+gst-launch-1.0 videotestsrc ! preprocessing ! autovideoconvert ! fpsdisplaysink -vvv
+gst-launch-1.0 videotestsrc ! video/x-raw,width=1280,height=1080,framerate=60/1,format=RGB ! preprocessing ! autovideoconvert ! fpsdisplaysink -vvv
+gst-launch-1.0 videotestsrc ! video/x-raw,width=640,height=480,framerate=30/1,format=YUY2 ! textoverlay text="Camera1" ! preprocessing ! nvvidconv ! fpsdisplaysink -vvv
 ```

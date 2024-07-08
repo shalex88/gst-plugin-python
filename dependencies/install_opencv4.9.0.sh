@@ -3,6 +3,7 @@
 BASE_ROOT_DIR=$HOME
 
 install_opencv () {
+  cd $BASE_ROOT_DIR
   # Check if the file /proc/device-tree/model exists
   if [ -e "/proc/device-tree/model" ]; then
       # Read the model information from /proc/device-tree/model and remove null bytes
@@ -136,19 +137,16 @@ install_opencv () {
   sudo make install
   sudo ldconfig
 
-  #sudo cp /usr/lib/python3.10/dist-packages/cv2/python-3.10/cv2.cpython-310-aarch64-linux-gnu.so /usr/lib/python3.10/dist-packages/cv2/python-3.10/cv2.cpython-310-aarch64-linux-gnu.so.orig
-  # sudo cp $BASE_ROOT_DIR/opencv/build/lib/python3/cv2.cpython-310-aarch64-linux-gnu.so /usr/lib/python3.10/dist-packages/cv2/python-3.10/
-
-  # cleaning (frees 320 MB)
   make clean
-  sudo apt-get update
+  rm -rf $BASE_ROOT_DIR/opencv
+  rm -rf $BASE_ROOT_DIR/opencv_contrib
 
-  echo "Congratulations!"
-  echo "You've successfully installed OpenCV 4.8.0 on your Nano"
+  echo "You've successfully installed OpenCV 4.9.0 on your Nano"
 }
 
-cd $BASE_ROOT_DIR
-
-if [ ! -d $BASE_ROOT_DIR/opencv/build ]; then
+if [ $(python3 -c "import cv2; print(cv2.getBuildInformation())" | grep -q 'NVIDIA CUDA: *NO') ]; then
+    echo "Installing OpenCV 4.9.0 with CUDA support"
     install_opencv
+else
+    echo "OpenCV 4.9.0 with CUDA support is already installed"
 fi
