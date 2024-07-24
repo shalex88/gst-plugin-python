@@ -14,11 +14,11 @@ install_opencv () {
           echo "Detecting a Jetson Nano Orin."
 	  # Use always "-j 4"
           NO_JOB=4
-          ARCH=8.7
+          arch_ver=8.7
           PTX="sm_87"
       elif [[ $model == *"Jetson Nano"* ]]; then
           echo "Detecting a regular Jetson Nano."
-          ARCH=5.3
+          arch_ver=5.3
           PTX="sm_53"
 	  # Use "-j 4" only swap space is larger than 5.5GB
 	  FREE_MEM="$(free -m | awk '/^Swap/ {print $2}')"
@@ -106,7 +106,7 @@ install_opencv () {
   -D CMAKE_INSTALL_PREFIX=/usr \
   -D OPENCV_EXTRA_MODULES_PATH=$BASE_ROOT_DIR/opencv_contrib/modules \
   -D WITH_OPENCL=OFF \
-  -D CUDA_ARCH_BIN=${ARCH} \
+  -D CUDA_ARCH_BIN=${arch_ver} \
   -D CUDA_ARCH_PTX=${PTX} \
   -D WITH_CUDA=ON \
   -D WITH_CUDNN=ON \
