@@ -43,17 +43,17 @@ install_opencv () {
 
   # reveal the CUDA location
   cd $BASE_ROOT_DIR
-  sudo sh -c "echo '/usr/local/cuda/lib64' >> /etc/ld.so.conf.d/nvidia-tegra.conf"
-  sudo ldconfig
+  sh -c "echo '/usr/local/cuda/lib64' >> /etc/ld.so.conf.d/nvidia-tegra.conf"
+  ldconfig
 
   # install the Jetson Nano dependencies first
   if [[ $model == *"Jetson Nano"* ]]; then
-    sudo apt-get install -y build-essential git unzip pkg-config zlib1g-dev
-    sudo apt-get install -y python3-dev python3-numpy
-    sudo apt-get install -y python-dev python-numpy
-    sudo apt-get install -y gstreamer1.0-tools libgstreamer-plugins-base1.0-dev
-    sudo apt-get install -y libgstreamer-plugins-good1.0-dev
-    sudo apt-get install -y libtbb2 libgtk-3-dev v4l2ucp libxine2-dev
+    apt-get install -y build-essential git unzip pkg-config zlib1g-dev
+    apt-get install -y python3-dev python3-numpy
+    apt-get install -y python-dev python-numpy
+    apt-get install -y gstreamer1.0-tools libgstreamer-plugins-base1.0-dev
+    apt-get install -y libgstreamer-plugins-good1.0-dev
+    apt-get install -y libtbb2 libgtk-3-dev v4l2ucp libxine2-dev
   fi
 
   if [ -f /etc/os-release ]; then
@@ -63,15 +63,15 @@ install_opencv () {
       VERSION_MAJOR=$(echo "$VERSION_ID" | cut -d'.' -f1)
       # Check if the extracted major version is 22 or earlier
       if [ "$VERSION_MAJOR" = "22" ]; then
-          sudo apt-get install -y libswresample-dev libdc1394-dev
+          apt-get install -y libswresample-dev libdc1394-dev
       else
-	  sudo apt-get install -y libavresample-dev libdc1394-22-dev
+	  apt-get install -y libavresample-dev libdc1394-22-dev
       fi
   else
-      sudo apt-get install -y libavresample-dev libdc1394-22-dev
+      apt-get install -y libavresample-dev libdc1394-22-dev
   fi
   # install the common dependencies
-  sudo apt-get install -y cmake \
+  apt-get install -y cmake \
 		libjpeg-dev libjpeg8-dev libjpeg-turbo8-dev \
 		libpng-dev libtiff-dev libglew-dev \
 		libavcodec-dev libavformat-dev libswscale-dev \
@@ -91,7 +91,7 @@ install_opencv () {
 
   # remove old versions or previous builds
   cd $BASE_ROOT_DIR
-  sudo rm -rf opencv*
+  rm -rf opencv*
   # download the 4.9.0 version
   git clone https://github.com/opencv/opencv -b 4.9.0
   git clone https://github.com/opencv/opencv_contrib -b 4.9.0
@@ -131,11 +131,11 @@ install_opencv () {
   directory="/usr/include/opencv4/opencv2"
   if [ -d "$directory" ]; then
     # Directory exists, so delete it
-    sudo rm -rf "$directory"
+    rm -rf "$directory"
   fi
 
-  sudo make install
-  sudo ldconfig
+  make install
+  ldconfig
 
   make clean
   rm -rf $BASE_ROOT_DIR/opencv

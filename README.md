@@ -5,7 +5,7 @@
 ## Install
 
 ```bash
-sudo apt install python3-gst-1.0 gstreamer1.0-python3-plugin-loader
+apt-get install python3-gst-1.0 gstreamer1.0-python3-plugin-loader
 # Test
 gst-inspect-1.0 python
 ```
